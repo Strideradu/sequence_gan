@@ -14,9 +14,9 @@ import random
 import subprocess
 import gzip
 
-EMB_DIM = 20
-HIDDEN_DIM = 25
-SEQ_LENGTH = 10
+EMB_DIM = 32
+HIDDEN_DIM = 64
+SEQ_LENGTH = 64
 START_TOKEN = 0
 
 EPOCH_ITER = 1000
@@ -25,7 +25,7 @@ TRAIN_ITER = 100000  # generator/discriminator alternating
 D_STEPS = 3  # how many times to train the discriminator per generator step
 SEED = 88
 
-DATA_FILE = 'book.txt'
+DATA_FILE = 'quansongci.txt'
 
 
 def tokenize(s):
@@ -34,21 +34,24 @@ def tokenize(s):
 
 def get_data(download=not os.path.exists(DATA_FILE)):
     """Downloads and parses Moby Dick."""
+    """
     if download:
         subprocess.check_output(
             ['wget', 'http://www.gutenberg.org/cache/epub/2701/pg2701.txt',
              '-O', DATA_FILE])
 
+    """
     token_stream = []
     is_gzip = False
+    
     try:
-        open(DATA_FILE).read(2)
+        open(DATA_FILE, encoding="utf8").read(2)
     except UnicodeDecodeError:
         is_gzip = True
     with gzip.open(DATA_FILE) if is_gzip else codecs.open(DATA_FILE, 'r', 'utf-8') as f:
         for line in f:
             line = line if not is_gzip else line.decode('utf-8')
-            if ('Call me Ishmael.' in line or token_stream) and line.strip():
+            if ('长忆钱塘' in line or token_stream) and line.strip():
                 token_stream.extend(tokenize(line.strip().lower()))
                 token_stream.append(' ')
             if len(token_stream) > 10000 * SEQ_LENGTH:  # enough data
