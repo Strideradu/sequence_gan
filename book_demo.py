@@ -15,8 +15,8 @@ import subprocess
 import gzip
 
 EMB_DIM = 32
-HIDDEN_DIM = 64
-SEQ_LENGTH = 64
+HIDDEN_DIM = 32
+SEQ_LENGTH = 32
 START_TOKEN = 0
 
 EPOCH_ITER = 1000
@@ -29,7 +29,8 @@ DATA_FILE = 'quansongci.txt'
 
 
 def tokenize(s):
-    return [c for c in ' '.join(s.split())]
+    # return [c for c in ' '.join(s.split())]
+    return list(s)
 
 
 def get_data(download=not os.path.exists(DATA_FILE)):
