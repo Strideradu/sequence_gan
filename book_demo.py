@@ -43,6 +43,7 @@ def get_data(download=not os.path.exists(DATA_FILE)):
 
     """
     token_stream = []
+    token = []
     is_gzip = False
     
     try:
@@ -53,12 +54,13 @@ def get_data(download=not os.path.exists(DATA_FILE)):
         for line in f:
             line = line if not is_gzip else line.decode('utf-8')
             if ('四时运灰琯' in line or token_stream) and line.strip():
-                token_stream.extend(tokenize(line.strip().lower()))
+                token_stream.append(line.strip().lower())
+                token.extend(line.strip().lower())
                 #token_stream.append(' ')
             if len(token_stream) > 100000 * SEQ_LENGTH:  # enough data
                 break
 
-    return token_stream
+    return token_stream, token
 
 
 class BookGRU(model.GRU):
@@ -78,8 +80,14 @@ def get_trainable_model(num_emb):
 
 def get_random_sequence(token_stream, word2idx):
     """Returns random subsequence."""
-    start_idx = random.randint(0, len(token_stream) - SEQ_LENGTH)
-    return [word2idx[tok] for tok in token_stream[start_idx:start_idx + SEQ_LENGTH]]
+    start_idx = random.randint(0, len(token_stream))
+    chosen_token = token_stream[start_idx]
+    if len(chosen_token) > SEQ_LENGTH:
+        chosen_token = chosen_token[0:SEQ_LENGTH]
+    else:
+        chosen_token = chosen_token + (SEQ_LENGTH - len(chosen_token)) * " "
+    #return [word2idx[tok] for tok in token_stream[start_idx:start_idx + SEQ_LENGTH]]
+    return [word2idx[tok] for tok in chosen_token]
 
 
 def verify_sequence(three_grams, seq):
@@ -94,15 +102,15 @@ def main():
     random.seed(SEED)
     np.random.seed(SEED)
 
-    token_stream = get_data()
+    token_stream, token = get_data()
     assert START_TOKEN == 0
-    words = ['_START'] + list(set(token_stream))
+    words = ['_START'] + list(set(token))
     word2idx = dict((word, i) for i, word in enumerate(words))
     num_words = len(words)
-    three_grams = dict((tuple(word2idx[w] for w in token_stream[i:i + 3]), True)
-                       for i in range(len(token_stream) - 3))
+    three_grams = dict((tuple(word2idx[w] for w in token[i:i + 3]), True)
+                       for i in range(len(token) - 3))
     print('num words', num_words)
-    print('stream length', len(token_stream))
+    print('stream length', len(token))
     print('distinct 3-grams', len(three_grams))
 
     trainable_model = get_trainable_model(num_words)
