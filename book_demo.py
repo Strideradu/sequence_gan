@@ -54,7 +54,9 @@ def get_data(download=not os.path.exists(DATA_FILE)):
         for line in f:
             line = line if not is_gzip else line.decode('utf-8')
             if ('四时运灰琯' in line or token_stream) and line.strip():
-                token_stream.append(line.strip().lower())
+                line_sp = line.strip().lower().split("。")
+                for poem in line_sp:
+                    token_stream.append(poem + "。")
                 token.extend(line.strip().lower())
                 #token_stream.append(' ')
             if len(token_stream) > 100000 * SEQ_LENGTH:  # enough data
@@ -82,7 +84,7 @@ def get_random_sequence(token_stream, word2idx):
     """Returns random subsequence."""
     start_idx = random.randint(0, len(token_stream))
     chosen_token = token_stream[start_idx]
-    if len(chosen_token) > SEQ_LENGTH:
+    if len(chosen_token) >= SEQ_LENGTH:
         chosen_token = chosen_token[0:SEQ_LENGTH]
     else:
         chosen_token = chosen_token + (SEQ_LENGTH - len(chosen_token)) * " "
