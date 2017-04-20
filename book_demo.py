@@ -15,7 +15,7 @@ import subprocess
 import gzip
 
 EMB_DIM = 32
-HIDDEN_DIM = 64
+HIDDEN_DIM = 32
 SEQ_LENGTH = 12
 START_TOKEN = 0
 
