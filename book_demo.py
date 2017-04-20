@@ -15,17 +15,17 @@ import subprocess
 import gzip
 
 EMB_DIM = 32
-HIDDEN_DIM = 32
-SEQ_LENGTH = 32
+HIDDEN_DIM = 64
+SEQ_LENGTH = 12
 START_TOKEN = 0
 
 EPOCH_ITER = 1000
-CURRICULUM_RATE = 0.02  # how quickly to move from supervised training to unsupervised
-TRAIN_ITER = 100000  # generator/discriminator alternating
+CURRICULUM_RATE = 0.005  # how quickly to move from supervised training to unsupervised
+TRAIN_ITER = 200000  # generator/discriminator alternating
 D_STEPS = 3  # how many times to train the discriminator per generator step
 SEED = 88
 
-DATA_FILE = 'quansongci.txt'
+DATA_FILE = 'wuyan.txt'
 
 
 def tokenize(s):
@@ -52,10 +52,10 @@ def get_data(download=not os.path.exists(DATA_FILE)):
     with gzip.open(DATA_FILE) if is_gzip else codecs.open(DATA_FILE, 'r', 'utf-8') as f:
         for line in f:
             line = line if not is_gzip else line.decode('utf-8')
-            if ('长忆钱塘' in line or token_stream) and line.strip():
+            if ('四时运灰琯' in line or token_stream) and line.strip():
                 token_stream.extend(tokenize(line.strip().lower()))
-                token_stream.append(' ')
-            if len(token_stream) > 10000 * SEQ_LENGTH:  # enough data
+                #token_stream.append(' ')
+            if len(token_stream) > 100000 * SEQ_LENGTH:  # enough data
                 break
 
     return token_stream
