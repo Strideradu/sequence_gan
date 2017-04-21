@@ -4,6 +4,7 @@ __doc__ = """Training utility functions."""
 
 import numpy as np
 import random
+import sys
 
 
 def train_epoch(sess, trainable_model, num_iter,
@@ -75,3 +76,4 @@ def train_epoch(sess, trainable_model, num_iter,
     print([words[x] if words else x for x in supervised_gen_x] if supervised_gen_x is not None else None,)
     print([words[x] if words else x for x in unsupervised_gen_x] if unsupervised_gen_x is not None else None)
     print('>>>> expected rewards:', np.mean(expected_rewards, axis=0))
+    sys.stdout.flush()
